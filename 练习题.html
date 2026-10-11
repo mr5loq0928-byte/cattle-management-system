@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>接口测试练习 · 任务说明</title>
+<style>
+  :root{--bg:#f6f7fb;--card:#fff;--line:#e3e6ef;--txt:#24292f;--sub:#6b7280;--main:#2f6fed;--warn:#d97706;--ok:#12a150}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.85 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+  .wrap{max-width:960px;margin:0 auto;padding:32px 20px 80px}
+  h1{font-size:26px;margin:0 0 6px}
+  .lead{color:var(--sub);margin:0 0 24px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin:0 0 14px}
+  h2{font-size:19px;margin:28px 0 10px;color:var(--main)}
+  ol,ul{margin:6px 0 6px 22px;padding:0}
+  li{margin:7px 0}
+  .tip{background:#fff8e6;border-left:4px solid var(--warn);padding:10px 14px;border-radius:6px;margin:12px 0;font-size:14px}
+  .ok{background:#eafaf0;border-left:4px solid var(--ok);padding:10px 14px;border-radius:6px;margin:12px 0;font-size:14px}
+  code{background:#eef1f7;padding:1px 6px;border-radius:5px;font-family:Consolas,Monaco,monospace;font-size:13px}
+  table.st{width:100%;border-collapse:collapse;font-size:13.5px;margin:8px 0}
+  table.st th,table.st td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  table.st th{background:#f8fafc;font-weight:600}
+  .muted{color:var(--sub);font-size:13.5px}
+  .part{background:#eef4ff;border-radius:8px;padding:6px 12px;font-size:13.5px;color:#2f6fed;margin:26px 0 0;display:inline-block;font-weight:600}
+  .step{display:flex;gap:12px;align-items:flex-start;margin:10px 0}
+  .num{flex:0 0 26px;height:26px;border-radius:50%;background:var(--main);color:#fff;text-align:center;line-height:26px;font-size:13px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>接口测试练习 · 任务说明</h1>
+  <p class="lead">被测系统：牛只管理系统的后台接口。你要做的事：<b>看文档 → 写测试用例 → 用 Postman 真跑一遍 → 把发现的问题整理成缺陷。</b></p>
+
+  <div class="ok">
+    <b>开始之前（3 步）：</b>
+    <div class="step"><div class="num">1</div><div>双击 <code>启动接口服务.bat</code>。浏览器会自动打开接口文档；那个最小化的「接口服务」窗口<b>不要关</b>。</div></div>
+    <div class="step"><div class="num">2</div><div>照着 <code>Postman操作步骤.html</code> 把 Postman 配好，先成功发出第一个请求。</div></div>
+    <div class="step"><div class="num">3</div><div>打开 <code>我的接口测试用例.xlsx</code>，开始写用例。</div></div>
+  </div>
+
+  <h2>你要交的三样东西</h2>
+  <div class="card">
+    <table class="st">
+      <tr><th style="width:22%">任务</th><th style="width:14%">数量要求</th><th>说明</th></tr>
+      <tr><td><b>任务一</b><br>写测试用例</td><td>至少 20 条</td><td>在 <code>我的接口测试用例.xlsx</code> 的「我的用例」表里写。只写"预期结果"，这一列先不要填"实际结果"。</td></tr>
+      <tr><td><b>任务二</b><br>Postman 实跑</td><td>至少 10 条</td><td>挑你写的用例，在 Postman 里真发一遍请求，把<b>实际返回</b>填到「实际结果」列，再判断"通过 / 不通过"。</td></tr>
+      <tr><td><b>任务三</b><br>提缺陷</td><td>找出几个算几个</td><td>凡是"实际和文档对不上"的，写进「缺陷清单」表。这个接口系统里<b>埋了若干个问题</b>，看你能挖出几个。</td></tr>
+    </table>
+    <div class="tip"><b>任务一和任务二的区别，别搞混：</b>「预期结果」是你<b>照文档推出来的</b>（还没测就知道应该是什么）；「实际结果」是你<b>真发请求之后看到的</b>。两者不一样，就是缺陷。</div>
+  </div>
+
+  <h2>用例表每一列怎么填</h2>
+  <div class="card">
+    <table class="st">
+      <tr><th style="width:20%">列名</th><th>填什么</th><th style="width:30%">举例</th></tr>
+      <tr><td>用例编号</td><td>自己编，按接口顺序排</td><td><code>API-001</code></td></tr>
+      <tr><td>接口名称</td><td>被测的是哪个接口</td><td><code>用户登录</code></td></tr>
+      <tr><td>请求方法</td><td>GET / POST / DELETE</td><td><code>POST</code></td></tr>
+      <tr><td>接口地址</td><td>接口路径（带参数的写全）</td><td><code>/api/login</code></td></tr>
+      <tr><td>用例标题</td><td>一句话说清这条测什么，<b>要具体</b></td><td><code>密码错误时登录失败</code></td></tr>
+      <tr><td>请求参数</td><td>具体传了什么（JSON 或查询参数）</td><td><code>{"username":"admin","password":"000000"}</code></td></tr>
+      <tr><td>前置条件</td><td>跑这条之前要满足什么</td><td><code>系统里存在用户 admin</code></td></tr>
+      <tr><td>预期结果</td><td>HTTP 状态码 + 返回内容</td><td><code>200，code=1001，msg=用户名或密码错误</code></td></tr>
+      <tr><td>实际结果</td><td>Postman 里真实看到的</td><td><code>200，code=0，msg=登录成功</code></td></tr>
+      <tr><td>是否通过</td><td>通过 / 不通过</td><td><code>不通过</code></td></tr>
+      <tr><td>备注</td><td>和哪条缺陷对应、或补充说明</td><td><code>见缺陷 B1</code></td></tr>
+    </table>
+  </div>
+
+  <h2>参考用例（照这个格式写，别照抄）</h2>
+  <div class="card">
+    <p>下面两条我写给你看格式，你自己再写 18 条以上。</p>
+    <table class="st">
+      <tr><th style="width:9%">编号</th><th style="width:11%">接口</th><th style="width:8%">方法</th><th style="width:13%">地址</th><th style="width:20%">用例标题</th><th style="width:19%">请求参数</th><th>预期结果</th></tr>
+      <tr>
+        <td>API-001</td><td>用户登录</td><td>POST</td><td>/api/login</td>
+        <td>正确用户名密码登录成功</td>
+        <td><code>{"username":"admin","password":"123456"}</code></td>
+        <td>HTTP 200，code=0，data 里有 token、userId、username、role</td>
+      </tr>
+      <tr>
+        <td>API-002</td><td>用户登录</td><td>POST</td><td>/api/login</td>
+        <td>密码错误时登录失败</td>
+        <td><code>{"username":"admin","password":"000000"}</code></td>
+        <td>HTTP 200，code=1001，msg=用户名或密码错误，data=null</td>
+      </tr>
+    </table>
+    <div class="tip">
+      <b>看出规律了吗？</b>同一个接口，先写"正常的能过"，再写"各种不正常的情况"。后者才是测试真正值钱的地方。
+    </div>
+  </div>  <h2>用例数量怎么分配</h2>
+  <div class="card">
+    <table class="st">
+      <tr><th style="width:26%">接口</th><th style="width:14%">建议条数</th><th>重点覆盖</th></tr>
+      <tr><td>1 用户登录</td><td>6 条</td><td>正确登录、密码错、用户名不存在、用户名为空、密码为空、返回内容是否安全</td></tr>
+      <tr><td>2 牛只列表</td><td>5 条</td><td>默认查询、翻页（page=2）、每页条数（size=3）、按品种筛选、筛选后的 total 对不对</td></tr>
+      <tr><td>3 牛只详情</td><td>4 条</td><td>正常 id、不存在的 id、id 传 0、id 传字母</td></tr>
+      <tr><td>4 新增牛只</td><td>6 条</td><td>正常新增、缺每个必填字段、耳标号重复、体重非法、不带 token</td></tr>
+      <tr><td>5 删除牛只</td><td>4 条</td><td>正常删除后复查、不存在的 id、<b>不带 token</b>、重复删除</td></tr>
+    </table>
+    <div class="tip">一共 25 条左右就够扎实了。<b>不用凑数量，要覆盖到"不正常"那边去</b> —— 一个接口写 5 条"正常能过"的，不如写 1 条正常 + 4 条异常。</div>
+  </div>
+
+  <h2>参数怎么设计（你学过的老方法，换个地方用）</h2>
+  <div class="card">
+    <p>你在功能测试里学的<b>等价类 + 边界值</b>，在接口测试里是同一套，只是观察对象从"输入框"变成了"参数"。</p>
+    <table class="st">
+      <tr><th style="width:24%">参数类型</th><th>举例（拿 ear_tag 耳标号说）</th></tr>
+      <tr><td>有效等价类</td><td><code>A0021</code>（系统里没有的、格式正常的新耳标号）</td></tr>
+      <tr><td>无效等价类</td><td>空字符串、重复的 <code>A0001</code>、特殊字符 <code>@@@</code>、超长字符串</td></tr>
+      <tr><td>边界值</td><td>1 个字符、刚好达到长度上限、超一位</td></tr>
+      <tr><td>类型错误</td><td>weight 传 <code>"五百"</code>（该传数字传了文字）</td></tr>
+      <tr><td>缺少参数</td><td>整个字段不传</td></tr>
+    </table>
+  </div>
+
+  <h2>接口测试比功能测试要多想的六件事</h2>
+  <div class="card">
+    <p class="muted">这就是"接口测试用例和功能测试用例的区别"，写用例时拿这张表当检查清单。</p>
+    <ol>
+      <li><b>参数本身</b>：必填 / 选填、类型、长度、格式、边界值、特殊字符、中文、为空</li>
+      <li><b>权限</b>：该要登录的接口，不带 token 会怎样？带一个假 token 呢？用别人的 token 呢？</li>
+      <li><b>敏感信息</b>：返回的数据里，有没有不该给前端看的东西（比如密码）？出错时有没有把技术细节暴露出去？</li>
+      <li><b>数据一致性</b>：新增完之后<b>查一次</b>确认真存进去了；删除完之后<b>查一次</b>确认真的没了</li>
+      <li><b>重复操作</b>：同一个请求连发两次会怎样？重复删除会怎样？</li>
+      <li><b>接口约定</b>：HTTP 状态码（200 / 400 / 401 / 404 / 500）和返回里的 <code>code</code>，是不是和文档写的一致</li>
+    </ol>
+    <div class="ok"><b>提示：</b>你这份练习里埋的问题，全都藏在上面的 6 条里。<b>一条条对着测，就能挖出来。</b></div>
+  </div>
+
+  <h2>新手最容易漏的四个地方</h2>
+  <div class="card">
+    <ul>
+      <li><b>只测"正常能过"，不测"不正常会怎样"</b> —— 缺陷基本都在异常路径上。</li>
+      <li><b>增删改之后不复查</b> —— 返回"新增成功"不等于真的存进去了，必须再查一次。</li>
+      <li><b>不看 HTTP 状态码</b>，只看返回的 JSON。这两个都要看。</li>
+      <li><b>筛选条件带了，但不检查 total</b> —— 列表返回 3 条、total 却写 10，这种问题最容易被放过。</li>
+    </ul>
+  </div>
+
+  <h2>做完之后</h2>
+  <div class="card">
+    <p>把 <code>我的接口测试用例.xlsx</code> 写完保存，然后把文件路径发给我，我帮你逐条批改：哪条写得好、哪条预期结果写错了、哪条漏了，以及你挖出了几个缺陷、还差哪些没找到。</p>
+    <p class="muted">参考答案在 <code>测试用例_参考答案.xlsx</code> 和 <code>参考答案_缺陷清单.html</code> 里。<b>建议先自己写完再看</b>，不然就白练了。</p>
+  </div>
+
+  <p class="muted" style="margin-top:26px">配套文件：<code>接口文档.html</code>（接口说明书）· <code>Postman操作步骤.html</code>（手把手）· <code>我的接口测试用例.xlsx</code>（答题纸）</p>
+
+</div>
+</body>
+</html>

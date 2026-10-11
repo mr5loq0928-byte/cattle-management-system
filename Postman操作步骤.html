@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Postman 手把手操作步骤</title>
+<style>
+  :root{--bg:#f6f7fb;--card:#fff;--line:#e3e6ef;--txt:#24292f;--sub:#6b7280;--main:#2f6fed;--warn:#d97706;--ok:#12a150}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.85 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+  .wrap{max-width:960px;margin:0 auto;padding:32px 20px 80px}
+  h1{font-size:26px;margin:0 0 6px}
+  .lead{color:var(--sub);margin:0 0 24px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin:0 0 14px}
+  h2{font-size:19px;margin:30px 0 10px;color:var(--main)}
+  ol,ul{margin:6px 0 6px 22px;padding:0}
+  li{margin:6px 0}
+  .tip{background:#fff8e6;border-left:4px solid var(--warn);padding:10px 14px;border-radius:6px;margin:12px 0;font-size:14px}
+  .ok{background:#eafaf0;border-left:4px solid var(--ok);padding:10px 14px;border-radius:6px;margin:12px 0;font-size:14px}
+  .err{background:#fef2f2;border-left:4px solid #dc2626;padding:10px 14px;border-radius:6px;margin:12px 0;font-size:14px}
+  code{background:#eef1f7;padding:1px 6px;border-radius:5px;font-family:Consolas,Monaco,monospace;font-size:13px}
+  pre{background:#1f2430;color:#e6edf3;border-radius:10px;padding:14px 16px;overflow:auto;font-family:Consolas,Monaco,monospace;font-size:13px;line-height:1.7;margin:8px 0}
+  table.st{width:100%;border-collapse:collapse;font-size:13.5px;margin:8px 0}
+  table.st th,table.st td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  table.st th{background:#f8fafc;font-weight:600}
+  .muted{color:var(--sub);font-size:13.5px}
+  .step{display:flex;gap:12px;align-items:flex-start;margin:16px 0 6px}
+  .num{flex:0 0 28px;height:28px;border-radius:50%;background:var(--main);color:#fff;text-align:center;line-height:28px;font-size:14px;font-weight:700}
+  .sh{font-weight:600;font-size:15.5px;line-height:28px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Postman 手把手操作步骤</h1>
+  <p class="lead">一次都没用过 Postman 也能跟上。照着做，10 分钟就能发出第一个请求。</p>
+
+  <div class="ok">
+    <b>开始前确认：</b>已经双击过 <code>启动接口服务.bat</code>，而且那个最小化的「接口服务」黑窗口还开着。<br>
+    不确定的话，用浏览器打开 <code>http://127.0.0.1:8124/</code>，能看到"接口服务正在运行"就对了。
+  </div>
+
+  <div class="step"><div class="num">1</div><div class="sh">打开 Postman，新建一个「集合」</div></div>
+  <div class="card">
+    <p>集合（Collection）就是"文件夹"，用来把同一套接口的请求放在一起，不然一会儿就乱成一锅粥。</p>
+    <ol>
+      <li>打开 Postman，左边一栏找到 <b>集合（Collections）</b>，点它旁边的 <b>+</b> 号，或者点 <b>新建（New）</b></li>
+      <li>选 <b>集合（Collection）</b></li>
+      <li>名字填：<code>接口测试练习</code>，回车保存</li>
+    </ol>
+  </div>
+
+  <div class="step"><div class="num">2</div><div class="sh">先发一个最简单的：查牛只列表</div></div>
+  <div class="card">
+    <ol>
+      <li>点左边 <code>接口测试练习</code> 集合，右边出现 <b>添加请求（Add a request）</b>，点它</li>
+      <li>上面那一行，左边下拉框默认是 <b>GET</b>，不用动</li>
+      <li>右边地址栏填：
+<pre>http://127.0.0.1:8124/api/cows</pre></li>
+      <li>点右边的蓝色按钮 <b>发送（Send）</b></li>
+    </ol>
+    <div class="tip">如果下面出现一大堆 JSON，恭喜，你已经会用了。剩下 90% 的操作都是在这个基础上改。</div>
+  </div>
+
+  <div class="step"><div class="num">3</div><div class="sh">看懂下面那块响应区</div></div>
+  <div class="card">
+    <p>点了发送之后，Postman 下半部分会变成这样，四个地方要关注：</p>
+    <table class="st">
+      <tr><th style="width:24%">位置</th><th>是什么</th></tr>
+      <tr><td><b>正文 → 那块带 1 2 3 行号的内容区</b><br><span class="muted">教材、英文版里叫 Pretty（美化）</span></td><td>服务器返回的内容，Postman 已经帮你格式化好了，最好看。写用例时【实际结果】就从这儿抄。</td></tr>
+      <tr><td><b>正文 → 左边那个 <code>{}</code> <code>JSON</code> 下拉框</b><br><span class="muted">教材、英文版里叫 Raw，你这版没有这个按钮了</span></td><td>决定用什么格式看这段内容（JSON / Text / HTML / XML）。想看原始的一行到底的文本，就把它改成 <b>Text</b>。平时不用动它。</td></tr>
+      <tr><td><b>正文 → 右边的 预览 / 可视化</b><br><span class="muted">这个练习用不上</span></td><td>预览 = 把返回内容当网页、图片那样看；可视化 = 用脚本把返回数据画成图表。知道有这两个按钮就行。</td></tr>
+      <tr><td>右上角 <b>200 OK</b></td><td><b>HTTP 状态码</b>。200 成功、400 参数错、401 没登录、404 找不到、500 程序崩了。</td></tr>
+      <tr><td>旁边的 <b>Time / Size</b></td><td>响应时间（毫秒）和返回数据大小。性能相关的问题看这里。</td></tr>
+    </table>
+    <div class="tip"><b>找不到教材里的 Pretty / Raw？</b>那是老版本（英文界面）的名字。你这版 Postman 12.28.6 中文版里：<b>Pretty</b> 就是你默认看到的那块带行号的内容区；<b>Raw</b> 这个按钮被去掉了，想把内容当普通文本看，就在左边的 <code>{}</code> <code>JSON</code> 下拉框里选 <b>Text</b>。做这个练习，默认的视图完全够用。</div>
+    <div class="err"><b>新手最爱犯的错：</b>只看 Body，不看状态码。有些缺陷恰恰是"Body 说成功，但状态码是 500"。</div>
+  </div>
+
+  <div class="step"><div class="num">4</div><div class="sh">发一个 POST 请求（用户登录）</div></div>
+  <div class="card">
+    <ol>
+      <li>再 <b>添加请求</b>，名字改成 <code>用户登录</code></li>
+      <li>左边下拉框从 GET 换成 <b>POST</b></li>
+      <li>地址填：
+<pre>http://127.0.0.1:8124/api/login</pre></li>
+      <li>点地址栏下面的 <b>正文（Body）</b> 标签</li>
+      <li>选 <b>raw</b>，最右边那个下拉框从 Text 改成 <b>JSON</b></li>
+      <li>在下面的大框里粘这段：
+<pre>{
+  "username": "admin",
+  "password": "123456"
+}</pre></li>
+      <li>点 <b>发送（Send）</b></li>
+    </ol>
+    <div class="tip">
+      <b>为什么必须选 JSON？</b> Postman 会自动帮你加上请求头 <code>Content-Type: application/json</code>。如果不选，服务器就不知道你发的是什么格式，可能直接报错。<br>
+      <b>顺便看一眼：</b>选完 JSON 之后，切到 <b>请求头（Headers）</b> 标签，你会看到 Postman 悄悄加的那一行。
+    </div>
+  </div>
+
+  <div class="step"><div class="num">5</div><div class="sh">把 token 记下来</div></div>
+  <div class="card">
+    <p>登录成功的返回里有一个 <code>token</code>，长得像 <code>tk_admin_1789882355671</code>。后面新增、删除牛只都要用它，先复制出来放到记事本里。</p>
+    <div class="tip"><b>注意：</b>每次登录 token 后面那串数字都不一样，这是正常的。你复制哪一次的都行。</div>
+  </div>  <div class="step"><div class="num">6</div><div class="sh">带 token 发新增请求</div></div>
+  <div class="card">
+    <ol>
+      <li>再 <b>添加请求</b>，名字叫 <code>新增牛只</code></li>
+      <li>方法选 <b>POST</b>，地址填 <code>http://127.0.0.1:8124/api/cows</code></li>
+      <li>切到 <b>请求头（Headers）</b> 标签，在表格里加一行：
+        <table class="st">
+          <tr><th style="width:36%">Key</th><th>Value</th></tr>
+          <tr><td>Authorization</td><td>刚才复制的 token，例如 <code>tk_admin_1789882355671</code></td></tr>
+        </table>
+      </li>
+      <li>切回 <b>正文（Body）</b> → raw → JSON，粘上：
+<pre>{
+  "ear_tag": "A0021",
+  "breed": "安格斯",
+  "gender": "公",
+  "in_date": "2026-09-20",
+  "weight": 520.5
+}</pre></li>
+      <li>点 <b>发送</b>。成功的话你会看到 <b>201 Created</b>，返回里带一个 <code>id</code>（比如 11）</li>
+    </ol>
+    <div class="tip"><b>把这个 id 记下来。</b>一会儿删它、查它都要用。这就是"造测试数据"。</div>
+    <div class="err">
+      <b>如果你把 Authorization 那一行去掉再发一次</b>，会看到 <b>401</b> —— 这是对的，说明接口在检查登录。<br>
+      那删除接口呢？<b>记得也试试不带 token 删一次。</b>
+    </div>
+  </div>
+
+  <div class="step"><div class="num">7</div><div class="sh">查询参数用 Params 标签写（别手敲 URL）</div></div>
+  <div class="card">
+    <p>要测 <code>?page=2&amp;size=5&amp;breed=荷斯坦</code> 这种，别在地址栏里手打，用 <b>参数（Params）</b> 标签，一个格子填一个：</p>
+    <table class="st">
+      <tr><th style="width:34%">Key</th><th>Value</th></tr>
+      <tr><td>page</td><td>2</td></tr>
+      <tr><td>size</td><td>5</td></tr>
+      <tr><td>breed</td><td>荷斯坦</td></tr>
+    </table>
+    <p class="muted">你一边填，上面地址栏会自动变成 <code>.../api/cows?page=2&amp;size=5&amp;breed=荷斯坦</code>。中文会被自动转码成 <code>%E8%8D%B7…</code>，<b>这是正常的</b>，不要去改它。</p>
+    <div class="tip">勾掉某一行前面的小勾勾，这个参数就临时不生效 —— 用这个办法可以快速对比"带参数"和"不带参数"的返回差异，很好用。</div>
+  </div>
+
+  <div class="step"><div class="num">8</div><div class="sh">把请求保存下来，然后复制改参数</div></div>
+  <div class="card">
+    <ol>
+      <li>每调好一个请求，按 <b>Ctrl + S</b> 保存到 <code>接口测试练习</code> 集合里，不然关了就没了</li>
+      <li>要测同一个接口的另一组参数：右键这个请求 → <b>复制（Duplicate）</b>，改个名字和参数就行</li>
+      <li>想批量重命名 / 整理，在左边集合里拖动就行</li>
+    </ol>
+    <div class="ok"><b>为什么建议每条用例存一个请求？</b> 因为你写测试用例时要填"实际结果"，存下来随时能再跑一次对照，也能截图当证据。这是真实工作的习惯。</div>
+  </div>
+
+  <div class="step"><div class="num">9</div><div class="sh">DELETE 请求怎么发</div></div>
+  <div class="card">
+    <p>方法下拉框选 <b>DELETE</b>，地址填 <code>http://127.0.0.1:8124/api/cows/11</code>（11 就是刚才新增那头的 id），Headers 里带上 Authorization，点发送。</p>
+    <div class="tip"><b>删完别急着走：</b>再发一次 <code>GET /api/cows/11</code>，确认它真的没了（应该返回 404）。<b>这一步叫"数据一致性验证"，是测试的基本功。</b></div>
+  </div>
+
+  <h2>出问题了怎么排查</h2>
+  <div class="card">
+    <table class="st">
+      <tr><th style="width:38%">你看到的</th><th>原因和处理</th></tr>
+      <tr><td>发送后卡住，或提示 <code>Error: connect ECONNREFUSED</code></td><td><b>接口服务没启动</b>。双击 <code>启动接口服务.bat</code>，等 3 秒再发。</td></tr>
+      <tr><td><code>404</code> + <code>接口不存在</code></td><td>URL 路径写错了，检查是不是漏了 <code>/api</code>，或者多打了一个斜杠。</td></tr>
+      <tr><td><code>500</code> + 一堆英文报错</td><td>程序崩了。<b>这本身就是一个缺陷</b>，把请求参数和返回内容一起记下来，写进缺陷清单。</td></tr>
+      <tr><td><code>400</code> + <code>请求体不是合法的 JSON</code></td><td>Body 里的 JSON 写错了，通常是少了逗号、少了大括号，或者 Body 那栏的格式没选 JSON。</td></tr>
+      <tr><td>返回的中文是乱码</td><td>Postman 很少出现。真的遇到就切到 <b>Body → Raw</b> 看一下原始内容。</td></tr>
+    </table>
+  </div>
+
+  <h2>中英文对照（万一界面是英文的）</h2>
+  <div class="card">
+    <table class="st">
+      <tr><th style="width:30%">English</th><th>中文</th></tr>
+      <tr><td>New</td><td>新建</td></tr>
+      <tr><td>Collections</td><td>集合</td></tr>
+      <tr><td>Send</td><td>发送</td></tr>
+      <tr><td>Save</td><td>保存</td></tr>
+      <tr><td>Params</td><td>参数（URL 后面的查询参数）</td></tr>
+      <tr><td>Authorization</td><td>授权（放 token 的地方）</td></tr>
+      <tr><td>Headers</td><td>请求头</td></tr>
+      <tr><td>Body</td><td>正文 / 主体（POST 的参数放这里）</td></tr>
+      <tr><td>raw / Pretty</td><td>原始 / 美化</td></tr>
+      <tr><td>Response</td><td>响应（服务器返回的内容）</td></tr>
+      <tr><td>Duplicate</td><td>复制</td></tr>
+    </table>
+  </div>
+
+  <h2>动手顺序建议</h2>
+  <div class="card">
+    <ol>
+      <li>先按上面 1~5 步发一次成功的请求，<b>建立手感</b></li>
+      <li>再打开 <code>练习题.html</code> 和 <code>接口文档.html</code>，开始写用例</li>
+      <li>每写完一条用例，就在 Postman 里跑一次，把实际结果填回去</li>
+      <li>跑的时候觉得"这不对啊"，别放过它 —— 那就是缺陷</li>
+    </ol>
+  </div>
+
+  <p class="muted" style="margin-top:26px">配套文件：<code>接口文档.html</code> · <code>练习题.html</code> · <code>我的接口测试用例.xlsx</code></p>
+
+</div>
+</body>
+</html>

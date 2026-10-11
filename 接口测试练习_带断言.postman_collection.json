@@ -1,0 +1,1612 @@
+{
+  "info": {
+    "name": "接口测试练习（带断言）",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "准备数据-恢复成初始的 10 头牛（不算用例）",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/_reset",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "_reset"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"数据已恢复成初始的 10 头牛\", function () {",
+              "    pm.response.to.have.status(200);",
+              "pm.expect(pm.response.json().data.count).to.eql(10);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-001 用户登录-正确密码",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"admin\",\r\n  \"password\": \"123456\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/login",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "login"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// 把登录拿到的 token 存进集合变量，后面用 {{token}} 引用",
+              "var res = pm.response.json();",
+              "console.log(\"取到的 token = \" + res.data.token);",
+              "pm.collectionVariables.set(\"token\", res.data.token);",
+              "",
+              "pm.test(\"API-001 ① HTTP 状态码 = 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"API-001 ② code = 0\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(0);",
+              "});",
+              "",
+              "pm.test(\"API-001 ③ data 里有 token\", function () {",
+              "    pm.expect(pm.response.json().data).to.have.property(\"token\");",
+              "});",
+              "",
+              "pm.test(\"API-001 ④ data 里有 userId / username / role\", function () {",
+              "    const d = pm.response.json().data;",
+              "pm.expect(d).to.have.property(\"userId\");",
+              "pm.expect(d).to.have.property(\"username\");",
+              "pm.expect(d).to.have.property(\"role\");",
+              "});",
+              "",
+              "pm.test(\"API-001 ⑤ data 里不含 password（安全要求）\", function () {",
+              "    pm.expect(pm.response.json().data).to.not.have.property(\"password\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-002 用户登录-错误密码",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"admin\",\r\n  \"password\": \"000000\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/login",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "login"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-002 ① HTTP 状态码 = 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"API-002 ② code = 1001\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(1001);",
+              "});",
+              "",
+              "pm.test(\"API-002 ③ msg = 用户名或密码错误\", function () {",
+              "    pm.expect(pm.response.json().msg).to.eql(\"用户名或密码错误\");",
+              "});",
+              "",
+              "pm.test(\"API-002 ④ data = null\", function () {",
+              "    pm.expect(pm.response.json().data).to.eql(null);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-003 用户登录-用户名不存在",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"zhangsan\",\r\n  \"password\": \"123456\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/login",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "login"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-003 ① HTTP 状态码 = 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"API-003 ② code = 1001\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(1001);",
+              "});",
+              "",
+              "pm.test(\"API-003 ③ msg = 用户名或密码错误\", function () {",
+              "    pm.expect(pm.response.json().msg).to.eql(\"用户名或密码错误\");",
+              "});",
+              "",
+              "pm.test(\"API-003 ④ data = null\", function () {",
+              "    pm.expect(pm.response.json().data).to.eql(null);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-004 用户登录-用户名为空",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"\",\r\n  \"password\": \"123456\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/login",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "login"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-004 ① HTTP 状态码 = 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"API-004 ② code = 1001\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(1001);",
+              "});",
+              "",
+              "pm.test(\"API-004 ③ msg = 用户名或密码错误\", function () {",
+              "    pm.expect(pm.response.json().msg).to.eql(\"用户名或密码错误\");",
+              "});",
+              "",
+              "pm.test(\"API-004 ④ data = null\", function () {",
+              "    pm.expect(pm.response.json().data).to.eql(null);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-006 用户登录-用户名大写",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"ADMIN\",\r\n  \"password\": \"123456\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/login",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "login"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-006 ① HTTP 状态码 = 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"API-006 ② code = 1001\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(1001);",
+              "});",
+              "",
+              "pm.test(\"API-006 ③ msg = 用户名或密码错误\", function () {",
+              "    pm.expect(pm.response.json().msg).to.eql(\"用户名或密码错误\");",
+              "});",
+              "",
+              "pm.test(\"API-006 ④ data = null\", function () {",
+              "    pm.expect(pm.response.json().data).to.eql(null);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-005 用户登录-密码为空",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"admin\",\r\n  \"password\": \"\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/login",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "login"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-005 ① HTTP 状态码 = 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test(\"API-005 ② code = 1002\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(1002);",
+              "});",
+              "",
+              "pm.test(\"API-005 ③ msg = 请求参数不合法\", function () {",
+              "    pm.expect(pm.response.json().msg).to.eql(\"请求参数不合法\");",
+              "});",
+              "",
+              "pm.test(\"API-005 ④ data = null\", function () {",
+              "    pm.expect(pm.response.json().data).to.eql(null);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-007 牛只列表-默认查询",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows?page=1&size=5",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "size",
+              "value": "5"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-007 ① HTTP 状态码 = 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"API-007 ② code = 0\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(0);",
+              "});",
+              "",
+              "pm.test(\"API-007 ③ page = 1\", function () {",
+              "    pm.expect(pm.response.json().data.page).to.eql(1);",
+              "});",
+              "",
+              "pm.test(\"API-007 ④ size = 5\", function () {",
+              "    pm.expect(pm.response.json().data.size).to.eql(5);",
+              "});",
+              "",
+              "pm.test(\"API-007 ⑤ total = 10\", function () {",
+              "    pm.expect(pm.response.json().data.total).to.eql(10);",
+              "});",
+              "",
+              "pm.test(\"API-007 ⑥ list 返回 5 条\", function () {",
+              "    pm.expect(pm.response.json().data.list.length).to.eql(5);",
+              "});",
+              "",
+              "pm.test(\"API-007 ⑦ 第一条 ear_tag = A0001\", function () {",
+              "    pm.expect(pm.response.json().data.list[0].ear_tag).to.eql(\"A0001\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-008 牛只列表-翻页",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows?page=2&size=5",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "2"
+            },
+            {
+              "key": "size",
+              "value": "5"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-008 ① HTTP 状态码 = 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"API-008 ② code = 0\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(0);",
+              "});",
+              "",
+              "pm.test(\"API-008 ③ page = 2\", function () {",
+              "    pm.expect(pm.response.json().data.page).to.eql(2);",
+              "});",
+              "",
+              "pm.test(\"API-008 ④ size = 5\", function () {",
+              "    pm.expect(pm.response.json().data.size).to.eql(5);",
+              "});",
+              "",
+              "pm.test(\"API-008 ⑤ total = 10\", function () {",
+              "    pm.expect(pm.response.json().data.total).to.eql(10);",
+              "});",
+              "",
+              "pm.test(\"API-008 ⑥ list 返回 5 条\", function () {",
+              "    pm.expect(pm.response.json().data.list.length).to.eql(5);",
+              "});",
+              "",
+              "pm.test(\"API-008 ⑦ 第一条 ear_tag = A0006\", function () {",
+              "    pm.expect(pm.response.json().data.list[0].ear_tag).to.eql(\"A0006\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-009 牛只列表-每页3头牛",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows?page=1&size=3",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "size",
+              "value": "3"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-009 ① HTTP 状态码 = 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"API-009 ② code = 0\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(0);",
+              "});",
+              "",
+              "pm.test(\"API-009 ③ page = 1\", function () {",
+              "    pm.expect(pm.response.json().data.page).to.eql(1);",
+              "});",
+              "",
+              "pm.test(\"API-009 ④ size = 3\", function () {",
+              "    pm.expect(pm.response.json().data.size).to.eql(3);",
+              "});",
+              "",
+              "pm.test(\"API-009 ⑤ total = 10\", function () {",
+              "    pm.expect(pm.response.json().data.total).to.eql(10);",
+              "});",
+              "",
+              "pm.test(\"API-009 ⑥ list 返回 3 条\", function () {",
+              "    pm.expect(pm.response.json().data.list.length).to.eql(3);",
+              "});",
+              "",
+              "pm.test(\"API-009 ⑦ 第一条 ear_tag = A0001\", function () {",
+              "    pm.expect(pm.response.json().data.list[0].ear_tag).to.eql(\"A0001\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-010 牛只列表-品种筛选",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows?breed=荷斯坦",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows"
+          ],
+          "query": [
+            {
+              "key": "breed",
+              "value": "荷斯坦"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-010 ① HTTP 状态码 = 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"API-010 ② code = 0\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(0);",
+              "});",
+              "",
+              "pm.test(\"API-010 ③ page = 1\", function () {",
+              "    pm.expect(pm.response.json().data.page).to.eql(1);",
+              "});",
+              "",
+              "pm.test(\"API-010 ④ size = 5\", function () {",
+              "    pm.expect(pm.response.json().data.size).to.eql(5);",
+              "});",
+              "",
+              "pm.test(\"API-010 ⑤ total = 3\", function () {",
+              "    pm.expect(pm.response.json().data.total).to.eql(3);",
+              "});",
+              "",
+              "pm.test(\"API-010 ⑥ list 返回 3 条\", function () {",
+              "    pm.expect(pm.response.json().data.list.length).to.eql(3);",
+              "});",
+              "",
+              "pm.test(\"API-010 ⑦ 第一条 ear_tag = A0002\", function () {",
+              "    pm.expect(pm.response.json().data.list[0].ear_tag).to.eql(\"A0002\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-011 牛只列表-筛选状态为淘汰的牛",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows?state=淘汰",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows"
+          ],
+          "query": [
+            {
+              "key": "state",
+              "value": "淘汰"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-011 ① HTTP 状态码 = 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"API-011 ② code = 0\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(0);",
+              "});",
+              "",
+              "pm.test(\"API-011 ③ page = 1\", function () {",
+              "    pm.expect(pm.response.json().data.page).to.eql(1);",
+              "});",
+              "",
+              "pm.test(\"API-011 ④ size = 5\", function () {",
+              "    pm.expect(pm.response.json().data.size).to.eql(5);",
+              "});",
+              "",
+              "pm.test(\"API-011 ⑤ total = 1\", function () {",
+              "    pm.expect(pm.response.json().data.total).to.eql(1);",
+              "});",
+              "",
+              "pm.test(\"API-011 ⑥ list 返回 1 条\", function () {",
+              "    pm.expect(pm.response.json().data.list.length).to.eql(1);",
+              "});",
+              "",
+              "pm.test(\"API-011 ⑦ 第一条 ear_tag = A0006\", function () {",
+              "    pm.expect(pm.response.json().data.list[0].ear_tag).to.eql(\"A0006\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-012 牛只详情-id为3",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-012 ① HTTP 状态码 = 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"API-012 ② code = 0\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(0);",
+              "});",
+              "",
+              "pm.test(\"API-012 ③ msg = ok\", function () {",
+              "    pm.expect(pm.response.json().msg).to.eql(\"ok\");",
+              "});",
+              "",
+              "pm.test(\"API-012 ④ data.id = 3\", function () {",
+              "    pm.expect(pm.response.json().data.id).to.eql(3);",
+              "});",
+              "",
+              "pm.test(\"API-012 ⑤ data.ear_tag = A0003\", function () {",
+              "    pm.expect(pm.response.json().data.ear_tag).to.eql(\"A0003\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": []
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows/3",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows",
+            "3"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "API-014 牛只详情-id为负数（-1）",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows/-1",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows",
+            "-1"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-014 ① HTTP 状态码 = 404\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "pm.test(\"API-014 ② code = 1404\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(1404);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-016 牛只详情-id为空",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows",
+            ""
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-016 ① HTTP 状态码 = 404\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "pm.test(\"API-016 ② code = 1404\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(1404);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-017 牛只详情-id过大（999）",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows/999",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows",
+            "999"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-017 ① HTTP 状态码 = 404\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "pm.test(\"API-017 ② code = 1004\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(1004);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-013 牛只详情-id为0",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows/0",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows",
+            "0"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-013 ① HTTP 状态码 = 404\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "pm.test(\"API-013 ② code = 1004\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(1004);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-015 牛只详情-id为字母（a）",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows/a",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows",
+            "a"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-015 ① HTTP 状态码 = 404\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "pm.test(\"API-015 ② code = 1404\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(1404);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-001b 用户登录（同一个请求，用来取 token）",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// 把登录拿到的 token 存进集合变量，后面用 {{token}} 引用",
+              "var res = pm.response.json();",
+              "console.log(\"取到的 token = \" + res.data.token);",
+              "pm.collectionVariables.set(\"token\", res.data.token);",
+              "",
+              "pm.test(\"API-001b ① HTTP 状态码 = 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"API-001b ② code = 0\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(0);",
+              "});",
+              "",
+              "pm.test(\"API-001b ③ data 里有 token\", function () {",
+              "    pm.expect(pm.response.json().data).to.have.property(\"token\");",
+              "});",
+              "",
+              "pm.test(\"API-001b ④ data 里有 userId / username / role\", function () {",
+              "    const d = pm.response.json().data;",
+              "pm.expect(d).to.have.property(\"userId\");",
+              "pm.expect(d).to.have.property(\"username\");",
+              "pm.expect(d).to.have.property(\"role\");",
+              "});",
+              "",
+              "pm.test(\"API-001b ⑤ data 里不含 password（安全要求）\", function () {",
+              "    pm.expect(pm.response.json().data).to.not.have.property(\"password\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "tk_admin_1789887073014",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"admin\",\r\n  \"password\": \"123456\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/login",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "API-018 新增牛只-正常新增",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"ear_tag\": \"11\",\r\n  \"breed\": \"荷斯坦\",\r\n  \"gender\":\"公\",\r\n  \"in_date\":\"2026-09-20\",\r\n  \"weight\":\"500\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-018 ① HTTP 状态码 = 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"API-018 ② code = 0\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(0);",
+              "});",
+              "",
+              "pm.test(\"API-018 ③ msg = 新增成功\", function () {",
+              "    pm.expect(pm.response.json().msg).to.eql(\"新增成功\");",
+              "});",
+              "",
+              "pm.test(\"API-018 ④ data.ear_tag = 11\", function () {",
+              "    pm.expect(pm.response.json().data.ear_tag).to.eql(\"11\");",
+              "});",
+              "",
+              "pm.test(\"API-018 ⑤ data.breed = 荷斯坦\", function () {",
+              "    pm.expect(pm.response.json().data.breed).to.eql(\"荷斯坦\");",
+              "});",
+              "",
+              "pm.test(\"API-018 ⑥ data.gender = 公\", function () {",
+              "    pm.expect(pm.response.json().data.gender).to.eql(\"公\");",
+              "});",
+              "",
+              "pm.test(\"API-018 ⑦ data.in_date = 2026-09-20\", function () {",
+              "    pm.expect(pm.response.json().data.in_date).to.eql(\"2026-09-20\");",
+              "});",
+              "",
+              "pm.test(\"API-018 ⑧ data.weight = 500\", function () {",
+              "    pm.expect(pm.response.json().data.weight).to.eql(500);",
+              "});",
+              "",
+              "pm.test(\"API-018 ⑨ data.state = 正常\", function () {",
+              "    pm.expect(pm.response.json().data.state).to.eql(\"正常\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-022 新增牛只-不带 token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": ""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"ear_tag\": \"11\",\r\n  \"breed\": \"荷斯坦\",\r\n  \"gender\":\"公\",\r\n  \"in_date\":\"2026-09-20\",\r\n  \"weight\":\"500\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-022 ① HTTP 状态码 = 401\", function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "",
+              "pm.test(\"API-022 ② code = 2001\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(2001);",
+              "});",
+              "",
+              "pm.test(\"API-022 ③ msg = 未登录或 token 无效\", function () {",
+              "    pm.expect(pm.response.json().msg).to.eql(\"未登录或 token 无效\");",
+              "});",
+              "",
+              "pm.test(\"API-022 ④ data = null\", function () {",
+              "    pm.expect(pm.response.json().data).to.eql(null);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-021 新增牛只-体重非法（五百）",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "tk_admin_1789902892495"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"ear_tag\": \"11\",\r\n  \"breed\": \"荷斯坦\",\r\n  \"gender\":\"公\",\r\n  \"in_date\":\"2026-09-20\",\r\n  \"weight\":\"五百\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-021 ① HTTP 状态码 = 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test(\"API-021 ② code = 1002\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(1002);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-019 新增牛只-耳标号重复（11 已存在）",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "tk_admin_1789902892495"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"ear_tag\": \"11\",\r\n  \"breed\": \"荷斯坦\",\r\n  \"gender\":\"母\",\r\n  \"in_date\":\"2026-09-21\",\r\n  \"weight\":\"450\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-019 ① HTTP 状态码 = 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test(\"API-019 ② code = 1002\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(1002);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-020 新增牛只-缺少必填字段（品种）",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "tk_admin_1789902892495"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"ear_tag\": \"11\",\r\n  \"gender\":\"公\",\r\n  \"in_date\":\"2026-09-20\",\r\n  \"weight\":\"500\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-020 ① HTTP 状态码 = 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test(\"API-020 ② code = 1002\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(1002);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-023 牛只删除-正常删除",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "tk_admin_1789882355671"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows/11",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows",
+            "11"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-023 ① HTTP 状态码 = 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"API-023 ② code = 0\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(0);",
+              "});",
+              "",
+              "pm.test(\"API-023 ③ msg = 删除成功\", function () {",
+              "    pm.expect(pm.response.json().msg).to.eql(\"删除成功\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-024 复查牛只-复查已删除的牛只",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows/11",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows",
+            "11"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-024 ① HTTP 状态码 = 404\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "pm.test(\"API-024 ② code = 1004\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(1004);",
+              "});",
+              "",
+              "pm.test(\"API-024 ③ msg = 牛只不存在\", function () {",
+              "    pm.expect(pm.response.json().msg).to.eql(\"牛只不存在\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-025 牛只删除-id 不存在（999）",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "tk_admin_1789882355671"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows/999",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows",
+            "999"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-025 ① HTTP 状态码 = 404\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "pm.test(\"API-025 ② code = 1004\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(1004);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-027 牛只删除-未登录状态删除",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "tk_admin_1789882355671",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8124/api/cows/11",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8124",
+          "path": [
+            "api",
+            "cows",
+            "11"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"API-027 ① HTTP 状态码 = 401\", function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "",
+              "pm.test(\"API-027 ② code = 2001\", function () {",
+              "    pm.expect(pm.response.json().code).to.eql(2001);",
+              "});",
+              "",
+              "pm.test(\"API-027 ③ msg = 未登录或 token 无效\", function () {",
+              "    pm.expect(pm.response.json().msg).to.eql(\"未登录或 token 无效\");",
+              "});",
+              "",
+              "pm.test(\"API-027 ④ data = null\", function () {",
+              "    pm.expect(pm.response.json().data).to.eql(null);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}

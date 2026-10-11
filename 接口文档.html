@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>牛只管理系统 · 接口文档（练习用）</title>
+<style>
+  :root{--bg:#f6f7fb;--card:#fff;--line:#e3e6ef;--txt:#24292f;--sub:#6b7280;--main:#2f6fed;--warn:#d97706;--ok:#12a150}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.85 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+  .wrap{max-width:960px;margin:0 auto;padding:32px 20px 80px}
+  h1{font-size:26px;margin:0 0 6px}
+  .lead{color:var(--sub);margin:0 0 24px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin:0 0 14px}
+  h2{font-size:19px;margin:28px 0 10px;color:var(--main);border-bottom:2px solid #e8eefc;padding-bottom:6px}
+  h3{font-size:15.5px;margin:18px 0 8px}
+  ol,ul{margin:6px 0 6px 22px;padding:0}
+  li{margin:6px 0}
+  .tip{background:#fff8e6;border-left:4px solid var(--warn);padding:10px 14px;border-radius:6px;margin:12px 0;font-size:14px}
+  .ok{background:#eafaf0;border-left:4px solid var(--ok);padding:10px 14px;border-radius:6px;margin:12px 0;font-size:14px}
+  .err{background:#fef2f2;border-left:4px solid #dc2626;padding:10px 14px;border-radius:6px;margin:12px 0;font-size:14px}
+  code{background:#eef1f7;padding:1px 6px;border-radius:5px;font-family:Consolas,Monaco,monospace;font-size:13px}
+  pre{background:#1f2430;color:#e6edf3;border-radius:10px;padding:14px 16px;overflow:auto;font-family:Consolas,Monaco,monospace;font-size:13px;line-height:1.7;margin:8px 0}
+  pre .k{color:#79c0ff}
+  table.st{width:100%;border-collapse:collapse;font-size:13.5px;margin:8px 0}
+  table.st th,table.st td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  table.st th{background:#f8fafc;font-weight:600}
+  .muted{color:var(--sub);font-size:13.5px}
+  .part{background:#eef4ff;border-radius:8px;padding:6px 12px;font-size:13.5px;color:#2f6fed;margin:28px 0 0;display:inline-block;font-weight:600}
+  .m-get{background:#e7f6ee;color:#0f7b45;font-weight:700;padding:1px 8px;border-radius:6px;font-size:13px}
+  .m-post{background:#fff2dc;color:#a35b00;font-weight:700;padding:1px 8px;border-radius:6px;font-size:13px}
+  .m-del{background:#fde8e8;color:#b91c1c;font-weight:700;padding:1px 8px;border-radius:6px;font-size:13px}
+  .api{display:flex;align-items:center;gap:10px;margin:4px 0 10px}
+  .api .path{font-family:Consolas,Monaco,monospace;font-size:14px;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>牛只管理系统 · 接口文档</h1>
+  <p class="lead">这是「被测系统」的接口说明书。你要照着它写测试用例，再用 Postman 一条条去验证。<b>文档写的是"应该怎样"，实际接口可能不是这样 —— 对不上的地方就是缺陷。</b></p>
+
+  <div class="ok">
+    <b>先做三件事：</b>
+    <ol>
+      <li>双击 <code>启动接口服务.bat</code> —— 服务跑起来后浏览器会自动打开本文件</li>
+      <li>确认服务活着：浏览器访问 <code>http://127.0.0.1:8124/</code> 能看到"接口服务正在运行"</li>
+      <li>打开 Postman，对着下面的接口一个个发请求</li>
+    </ol>
+  </div>
+
+  <h2>一、通用约定</h2>
+  <div class="card">
+    <table class="st">
+      <tr><th style="width:22%">项目</th><th>说明</th></tr>
+      <tr><td>服务地址</td><td><code>http://127.0.0.1:8124</code></td></tr>
+      <tr><td>请求格式</td><td>JSON，请求头要带 <code>Content-Type: application/json</code></td></tr>
+      <tr><td>编码</td><td>UTF-8</td></tr>
+      <tr><td>鉴权方式</td><td>登录后拿到 <code>token</code>，放在请求头 <code>Authorization: 你的token</code></td></tr>
+      <tr><td>数据存储</td><td>内存里，<b>重启服务就恢复成初始的 10 头牛</b></td></tr>
+    </table>
+
+    <h3>响应统一结构</h3>
+<pre>{
+  "code": 0,          <span class="k">// 0 = 成功，非 0 = 失败</span>
+  "msg": "ok",        <span class="k">// 提示信息</span>
+  "data": { }         <span class="k">// 具体数据，失败时通常是 null</span>
+}</pre>
+
+    <h3>错误码对照表</h3>
+    <table class="st">
+      <tr><th style="width:14%">code</th><th style="width:20%">HTTP 状态码</th><th>含义</th></tr>
+      <tr><td>0</td><td>200 / 201</td><td>成功</td></tr>
+      <tr><td>1001</td><td>200</td><td>用户名或密码错误</td></tr>
+      <tr><td>1002</td><td>400</td><td>请求参数不合法（含请求体不是合法 JSON）</td></tr>
+      <tr><td>1004</td><td>404</td><td>牛只不存在</td></tr>
+      <tr><td>1404</td><td>404</td><td>接口路径不存在</td></tr>
+      <tr><td>2001</td><td>401</td><td>未登录或 token 无效</td></tr>
+      <tr><td>5000</td><td>500</td><td>服务器内部错误</td></tr>
+    </table>
+    <div class="tip">
+      <b>注意看这条规则：</b>参数不合法时应该返回 <b>400 + code 1002</b>，而不是 500。<br>
+      500 是"程序崩了"，属于严重问题；参数写错是用户能犯的错，应该给友好提示。
+    </div>
+  </div>
+
+  <h2>二、业务规则</h2>
+  <div class="card">
+    <ul>
+      <li><b>耳标号必须唯一</b> —— 系统里不能有两头牛用同一个耳标号。</li>
+      <li><b>必填字段</b>：<code>ear_tag</code>、<code>breed</code>、<code>gender</code>、<code>in_date</code>、<code>weight</code>。缺任何一个都应该返回 400 + code 1002。</li>
+      <li><b>选填字段</b>：<code>state</code>，不传时默认是 <code>正常</code>。</li>
+      <li><b>性别</b>只能是 <code>公</code> 或 <code>母</code>；<b>状态</b>只能是 <code>正常</code> / <code>出栏</code> / <code>淘汰</code>。</li>
+      <li><b>需要登录才能调用的接口</b>：新增牛只、删除牛只。没带 token 必须返回 401 + code 2001。</li>
+      <li><b>不需要登录的</b>：登录接口本身、牛只列表、牛只详情。</li>
+      <li><b>返回的用户信息中不允许包含密码</b>（安全要求，明文密码属于严重问题）。</li>
+    </ul>
+  </div>  <div class="part">接口清单</div>
+
+  <h2>接口 1 · 用户登录</h2>
+  <div class="card">
+    <div class="api"><span class="m-post">POST</span><span class="path">/api/login</span><span class="muted">不需要 token</span></div>
+    <h3>请求体参数</h3>
+    <table class="st">
+      <tr><th style="width:18%">参数名</th><th style="width:14%">类型</th><th style="width:12%">必填</th><th>说明</th></tr>
+      <tr><td>username</td><td>字符串</td><td>是</td><td>用户名，系统里有 admin 和 tester 两个账号</td></tr>
+      <tr><td>password</td><td>字符串</td><td>是</td><td>密码，两个账号的密码都是 123456</td></tr>
+    </table>
+    <h3>请求示例</h3>
+<pre>POST http://127.0.0.1:8124/api/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "123456"
+}</pre>
+    <h3>成功响应（200）</h3>
+<pre>{
+  "code": 0,
+  "msg": "登录成功",
+  "data": {
+    "token": "tk_admin_1789882355671",
+    "userId": 1,
+    "username": "admin",
+    "role": "管理员"
+  }
+}</pre>
+    <div class="tip"><b>看清楚：</b>返回的 <code>data</code> 里只应该有 <b>token、userId、username、role</b> 四个字段。<b>不应该有 password。</b></div>
+    <h3>失败响应（密码错误 / 用户名不存在）</h3>
+<pre>{
+  "code": 1001,
+  "msg": "用户名或密码错误",
+  "data": null
+}</pre>
+    <div class="tip">
+      <b>要测的点：</b>正确密码、错误密码、用户名不存在、用户名为空、密码为空、多传一个没用的字段、大小写（Admin vs admin）……<br>
+      <b>别忘了：</b>密码错误和用户名不存在，返回的提示应该一样（不能告诉对方"用户名对了密码错了"，那是安全漏洞）。
+    </div>
+  </div>
+
+  <h2>接口 2 · 牛只列表（分页 + 筛选）</h2>
+  <div class="card">
+    <div class="api"><span class="m-get">GET</span><span class="path">/api/cows</span><span class="muted">不需要 token</span></div>
+    <h3>URL 查询参数（都是选填）</h3>
+    <table class="st">
+      <tr><th style="width:18%">参数名</th><th style="width:14%">类型</th><th style="width:14%">默认值</th><th>说明</th></tr>
+      <tr><td>page</td><td>整数</td><td>1</td><td>第几页，从 1 开始</td></tr>
+      <tr><td>size</td><td>整数</td><td>5</td><td>每页显示几条</td></tr>
+      <tr><td>breed</td><td>字符串</td><td>空</td><td>按品种筛选，如 <code>荷斯坦</code></td></tr>
+      <tr><td>state</td><td>字符串</td><td>空</td><td>按状态筛选，如 <code>淘汰</code></td></tr>
+    </table>
+    <h3>请求示例</h3>
+<pre>GET http://127.0.0.1:8124/api/cows?page=1&amp;size=5
+GET http://127.0.0.1:8124/api/cows?page=2&amp;size=5
+GET http://127.0.0.1:8124/api/cows?breed=荷斯坦</pre>
+    <h3>成功响应（200）</h3>
+<pre>{
+  "code": 0,
+  "msg": "ok",
+  "data": {
+    "page": 1,
+    "size": 5,
+    "total": 10,
+    "list": [ { "id": 1, "ear_tag": "A0001", ... } ]
+  }
+}</pre>
+    <div class="tip">
+      <b>三个关键约定，测的时候一条条对：</b><br>
+      1. <code>page</code> 是第几页就返回第几页的数据 —— <b>page=2 不能再给第一页的牛</b>。<br>
+      2. <code>size</code> 是几条就返回几条。<br>
+      3. <code>total</code> 是<b>符合条件的总条数</b>，不是本页条数。比如库里一共 10 头牛，按品种筛出 3 头，那 total 应该是 <b>3</b>。<br>
+      <span class="muted">（初始数据：一共 10 头牛。荷斯坦 3 头、西门塔尔 3 头、夏洛莱 2 头、鲁西黄牛 2 头；淘汰状态 1 头、出栏状态 2 头。）</span>
+    </div>
+  </div>
+
+  <h2>接口 3 · 牛只详情</h2>
+  <div class="card">
+    <div class="api"><span class="m-get">GET</span><span class="path">/api/cows/{id}</span><span class="muted">不需要 token</span></div>
+    <h3>路径参数</h3>
+    <table class="st">
+      <tr><th style="width:18%">参数名</th><th style="width:14%">类型</th><th style="width:12%">必填</th><th>说明</th></tr>
+      <tr><td>id</td><td>整数</td><td>是</td><td>牛只编号，如 <code>3</code></td></tr>
+    </table>
+    <h3>成功响应（200）</h3>
+<pre>{
+  "code": 0,
+  "msg": "ok",
+  "data": {
+    "id": 3,
+    "ear_tag": "A0003",
+    "breed": "西门塔尔",
+    "gender": "公",
+    "in_date": "2023-11-20",
+    "weight": 610.8,
+    "state": "出栏"
+  }
+}</pre>
+    <h3>失败响应（404）</h3>
+<pre>{
+  "code": 1004,
+  "msg": "牛只不存在",
+  "data": null
+}</pre>
+    <div class="tip"><b>要测的点：</b>存在的 id、不存在的 id（比如 999）、id 传 0、id 传负数、id 传字母 <code>abc</code>、id 不传（变成 <code>/api/cows/</code>）。<br>每种情况的<b>状态码</b>和 <b>code</b> 都要和文档对上。</div>
+  </div>  <h2>接口 4 · 新增牛只</h2>
+  <div class="card">
+    <div class="api"><span class="m-post">POST</span><span class="path">/api/cows</span><span class="muted">需要 token</span></div>
+    <h3>请求头</h3>
+    <table class="st">
+      <tr><th style="width:26%">名称</th><th>值</th></tr>
+      <tr><td>Content-Type</td><td><code>application/json</code></td></tr>
+      <tr><td>Authorization</td><td>登录接口返回的 token，例如 <code>tk_admin_1789882355671</code></td></tr>
+    </table>
+    <h3>请求体参数</h3>
+    <table class="st">
+      <tr><th style="width:18%">参数名</th><th style="width:14%">类型</th><th style="width:12%">必填</th><th>说明</th></tr>
+      <tr><td>ear_tag</td><td>字符串</td><td>是</td><td>耳标号，不能和已有的重复</td></tr>
+      <tr><td>breed</td><td>字符串</td><td>是</td><td>品种</td></tr>
+      <tr><td>gender</td><td>字符串</td><td>是</td><td>公 / 母</td></tr>
+      <tr><td>in_date</td><td>字符串</td><td>是</td><td>入栏日期，格式 <code>YYYY-MM-DD</code></td></tr>
+      <tr><td>weight</td><td>数字</td><td>是</td><td>体重（公斤）</td></tr>
+      <tr><td>state</td><td>字符串</td><td>否</td><td>不传默认 <code>正常</code></td></tr>
+    </table>
+    <h3>请求示例</h3>
+<pre>POST http://127.0.0.1:8124/api/cows
+Content-Type: application/json
+Authorization: tk_admin_1789882355671
+
+{
+  "ear_tag": "A0021",
+  "breed": "安格斯",
+  "gender": "公",
+  "in_date": "2026-09-20",
+  "weight": 520.5
+}</pre>
+    <h3>成功响应（201）</h3>
+<pre>{
+  "code": 0,
+  "msg": "新增成功",
+  "data": {
+    "id": 11,
+    "ear_tag": "A0021",
+    "breed": "安格斯",
+    "gender": "公",
+    "in_date": "2026-09-20",
+    "weight": 520.5,
+    "state": "正常"
+  }
+}</pre>
+    <h3>失败响应</h3>
+<pre><span class="k">// 没带 token（401）</span>
+{ "code": 2001, "msg": "未登录或 token 无效", "data": null }
+
+<span class="k">// 缺必填参数 / 参数不合法（400）</span>
+{ "code": 1002, "msg": "参数不合法：ear_tag 不能为空", "data": null }</pre>
+    <div class="tip">
+      <b>要测的点（这是本套练习的重点）：</b><br>
+      1. 正常新增一头牛，新增完再用 <code>GET /api/cows/{id}</code> 查一下，确认真的存进去了；<br>
+      2. 五个必填字段<b>逐个</b>不传，看返回什么；<br>
+      3. 用<b>已经存在的耳标号</b>（比如 A0001）再新增一次，看会不会被拦住；<br>
+      4. 体重传负数 / 0 / 超大值 / 文字；日期传 <code>2026-13-45</code> 这种不存在的日期；性别传 <code>未知</code>；<br>
+      5. 不带 token、带一个假 token。
+    </div>
+  </div>
+
+  <h2>接口 5 · 删除牛只</h2>
+  <div class="card">
+    <div class="api"><span class="m-del">DELETE</span><span class="path">/api/cows/{id}</span><span class="muted">需要 token</span></div>
+    <h3>路径参数</h3>
+    <table class="st">
+      <tr><th style="width:18%">参数名</th><th style="width:14%">类型</th><th style="width:12%">必填</th><th>说明</th></tr>
+      <tr><td>id</td><td>整数</td><td>是</td><td>要删除的牛只编号</td></tr>
+    </table>
+    <h3>请求示例</h3>
+<pre>DELETE http://127.0.0.1:8124/api/cows/11
+Authorization: tk_admin_1789882355671</pre>
+    <h3>成功响应（200）</h3>
+<pre>{
+  "code": 0,
+  "msg": "删除成功",
+  "data": { "id": 11, "ear_tag": "A0021", ... }
+}</pre>
+    <h3>失败响应</h3>
+<pre><span class="k">// 没带 token（401）</span>
+{ "code": 2001, "msg": "未登录或 token 无效", "data": null }
+
+<span class="k">// 牛不存在（404）</span>
+{ "code": 1004, "msg": "牛只不存在", "data": null }</pre>
+    <div class="tip">
+      <b>要测的点：</b>先新增一头牛拿到它的 id，再删掉它，然后<b>再查一次</b>确认真的没了；<br>
+      删一个不存在的 id；<b>不登录直接删</b>（这条是重点，一定要试）；删一个已经删过的 id（重复删除）。
+    </div>
+  </div>
+
+  <h2>接口 6 · 练习辅助接口（不算测试对象）</h2>
+  <div class="card">
+    <div class="api"><span class="m-post">POST</span><span class="path">/api/_reset</span></div>
+    <p>把数据恢复成最初的 10 头牛。做增删改练习弄乱了，就调它一下，不用重启服务。</p>
+<pre>POST http://127.0.0.1:8124/api/_reset
+{ "code": 0, "msg": "数据已恢复", "data": { "count": 10 } }</pre>
+    <div class="tip">这个接口是给你练习用的，<b>不要去测它</b>。</div>
+  </div>
+
+  <h2>三、接下来做什么</h2>
+  <div class="card">
+    <ol>
+      <li>打开 <code>练习题.html</code>，看清楚任务要求</li>
+      <li>照着本文件，在 <code>我的接口测试用例.xlsx</code> 里写测试用例（至少 20 条）</li>
+      <li>挑其中的用例，在 Postman 里真发一遍请求，把<b>实际结果</b>填回表格</li>
+      <li>把"实际结果和文档对不上"的地方整理成缺陷，填到表格最后的缺陷清单里</li>
+    </ol>
+    <div class="err">
+      <b>一条小要求：</b>请不要打开 <code>接口服务</code> 文件夹里的代码看。<br>
+      真实工作里，测试是拿文档当依据去验证的；看了代码你就等于提前看答案了，测出来的问题也不算你自己发现的。
+    </div>
+  </div>
+
+  <p class="muted" style="margin-top:26px">服务地址：<code>http://127.0.0.1:8124</code>　·　启动：<code>启动接口服务.bat</code>　·　停止：<code>停止接口服务.bat</code></p>
+
+</div>
+</body>
+</html>

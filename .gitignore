@@ -1,0 +1,38 @@
+# Dependencies and interpreter environments
+node_modules/
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+# Editors and caches
+.idea/
+.vscode/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+# Local credentials and runtime output
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.log
+*.tmp
+*.bak
+*.sqlite
+*.sqlite3
+*.db
+*.pid
+Newman练习/
+newman/
+reports/
+coverage/
+# Personal exercises and generated files
+我的接口测试用例.xlsx
+我的接口测试报告.xlsx
+Thumbs.db
+Desktop.ini
+.DS_Store

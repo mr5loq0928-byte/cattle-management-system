@@ -1,0 +1,14 @@
+{
+  "name": "cattle-management-system",
+  "version": "0.1.0",
+  "description": "牛只管理系统：用于功能、接口与自动化测试学习的本地 Demo",
+  "private": true,
+  "scripts": {
+    "start": "node 接口服务/api-server.js",
+    "check": "node --check 接口服务/api-server.js && node --check 接口服务/api-data.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}
